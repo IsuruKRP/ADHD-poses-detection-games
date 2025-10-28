@@ -10,7 +10,7 @@ export default function App() {
       {route === "home" && (
         <div className="min-h-screen flex flex-col">
           <div className="px-6 py-6 flex items-center justify-between">
-            <h1 className="text-2xl md:text-4xl font-black tracking-wide drop-shadow">
+            <h1 className="text-2xl md:text-4xl font-black tracking-wide drop-shadow text-center">
               🎮 Pose Games Lab
             </h1>
           </div>

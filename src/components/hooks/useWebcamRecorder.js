@@ -86,14 +86,42 @@ export default function useWebcamRecorder({
     () =>
       new Promise((resolve) => {
         const mr = mediaRecorderRef.current;
-        if (!mr) return resolve(null);
+        if (!mr) {
+          // Also ensure tracks are stopped if recorder is missing
+          try {
+            if (streamRef.current) {
+              streamRef.current.getTracks().forEach((t) => t.stop());
+              streamRef.current = null;
+            }
+            if (videoRef.current) videoRef.current.srcObject = null;
+          } catch (err) {
+            console.warn("error stopping stream without recorder", err);
+          }
+          return resolve(null);
+        }
+
+        const finalize = () => {
+          // Stop all underlying media tracks (audio + video) so mic/cam turn off
+          try {
+            if (streamRef.current) {
+              streamRef.current.getTracks().forEach((t) => t.stop());
+              streamRef.current = null;
+            }
+            if (videoRef.current) videoRef.current.srcObject = null;
+          } catch (err) {
+            console.warn("error stopping stream tracks after recording", err);
+          }
+          setRecording(false);
+        };
+
         mr.onstop = () => {
           const blob = new Blob(chunksRef.current, {
             type: mr.mimeType || "video/webm",
           });
-          setRecording(false);
+          finalize();
           resolve(blob);
         };
+
         try {
           mr.stop();
         } catch (err) {
@@ -102,7 +130,7 @@ export default function useWebcamRecorder({
           const blob = new Blob(chunksRef.current, {
             type: mr.mimeType || "video/webm",
           });
-          setRecording(false);
+          finalize();
           resolve(blob);
         }
       }),

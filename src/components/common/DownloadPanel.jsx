@@ -14,8 +14,7 @@ export default function DownloadPanel({ blob, meta }) {
     <div className="mx-auto mt-5 w-full max-w-3xl p-4 rounded-2xl bg-white/10 text-white">
       <h3 className="text-xl font-bold mb-2">Downloads</h3>
       <p className="text-sm opacity-90 mb-3">
-        Save these files for your dataset. <b>.webm</b> is ideal for later MediaPipe processing.
-        Convert to .mp4 offline if needed.
+        Save these files for your dataset. 
       </p>
       <div className="flex flex-wrap gap-3">
         <a className="px-5 py-3 bg-[#ffd60a] text-black rounded-2xl font-bold" href={videoUrl} download={videoName}>
