@@ -9,13 +9,13 @@ const ACTIONS = [
   { text: "Raise your hands high 🙌" },
   { text: "Touch your shoulders 🤷‍♂️" },
   { text: "Wave to the camera 👋" },
-  { text: "Clap 3 times 👏👏👏" },
+  { text: "Clap  times 👏👏👏" },
 ];
 const ACTION_VIDEOS = {
   "Raise your hands high 🙌": "/video/raise_hands.mp4",
   "Touch your shoulders 🤷‍♂️": "/video/touch_shoulders.mp4",
   "Wave to the camera 👋": "/video/waves.mp4",
-  "Clap 3 times 👏👏👏": "/video/clap.mp4",
+  "Clap  times 👏👏👏": "/video/clap.mp4",
 };
 
 
