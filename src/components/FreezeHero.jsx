@@ -6,10 +6,10 @@ import DownloadPanel from "./common/DownloadPanel";
 
 // 🎵 actions for the MOVE phase
 const ACTIONS = [
-   { text: "Raise your hands high 🙌" },
+  { text: "Raise your hands high 🙌" },
   { text: "Touch your shoulders 🤷‍♂️" },
   { text: "Wave to the camera 👋" },
-  { text: "Clap  👏👏👏" },
+  { text: "Clap 3 times 👏👏👏" },
 ];
 const ACTION_VIDEOS = {
   "Raise your hands high 🙌": "/video/raise_hands.mp4",
@@ -17,6 +17,7 @@ const ACTION_VIDEOS = {
   "Wave to the camera 👋": "/video/waves.mp4",
   "Clap 3 times 👏👏👏": "/video/clap.mp4",
 };
+
 
 // ⭐ simple confetti burst
 function StarBurst({ trigger }) {
@@ -130,6 +131,7 @@ const [age, setAge] = useState("");
   // countdown timer
   // Keep latest endSession in a ref to avoid effect deps churn
   const endSessionRef = useRef(() => {});
+  const MOVE_DURATION = 10;
   useEffect(() => { endSessionRef.current = endSession; }, [endSession]);
   useEffect(() => {
     if (!running) return;
@@ -146,12 +148,13 @@ const [age, setAge] = useState("");
     return () => clearInterval(timer);
   }, [running]);
 
-  // alternate MOVE / FREEZE every 5s
+  // alternate MOVE / FREEZE every MOVE_DURATION seconds
   useEffect(() => {
     if (!running) return;
     let current = "move";
     setPhase(current);
     setCurrentAction(ACTIONS[Math.floor(Math.random() * ACTIONS.length)]);
+
     const id = setInterval(() => {
       current = current === "move" ? "freeze" : "move";
       setPhase(current);
@@ -160,10 +163,9 @@ const [age, setAge] = useState("");
         const next = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
         setCurrentAction(next);
       } else {
-        // trigger confetti each time FREEZE appears
-        setBurstKey((k) => k + 1);
+        setBurstKey((k) => k + 1); // trigger confetti
       }
-    }, 5000);
+    }, MOVE_DURATION * 1000); // ⏱ dynamic duration
     return () => clearInterval(id);
   }, [running]);
 
