@@ -132,6 +132,9 @@ const [age, setAge] = useState("");
   // Keep latest endSession in a ref to avoid effect deps churn
   const endSessionRef = useRef(() => {});
   const MOVE_DURATION = 10;
+  const FREEZE_DURATION = 5;
+  const phaseTimeoutRef = useRef(null);
+  const currentPhaseRef = useRef("move");
   useEffect(() => { endSessionRef.current = endSession; }, [endSession]);
   useEffect(() => {
     if (!running) return;
@@ -148,25 +151,42 @@ const [age, setAge] = useState("");
     return () => clearInterval(timer);
   }, [running]);
 
-  // alternate MOVE / FREEZE every MOVE_DURATION seconds
+  // alternate MOVE / FREEZE with different durations
   useEffect(() => {
-    if (!running) return;
-    let current = "move";
-    setPhase(current);
-    setCurrentAction(ACTIONS[Math.floor(Math.random() * ACTIONS.length)]);
+    if (!running) {
+      if (phaseTimeoutRef.current) {
+        clearTimeout(phaseTimeoutRef.current);
+        phaseTimeoutRef.current = null;
+      }
+      return;
+    }
 
-    const id = setInterval(() => {
-      current = current === "move" ? "freeze" : "move";
-      setPhase(current);
-
-      if (current === "move") {
+    const switchPhase = () => {
+      if (currentPhaseRef.current === "move") {
+        currentPhaseRef.current = "freeze";
+        setPhase("freeze");
+        setBurstKey((k) => k + 1); // trigger confetti
+        phaseTimeoutRef.current = setTimeout(switchPhase, FREEZE_DURATION * 1000);
+      } else {
+        currentPhaseRef.current = "move";
+        setPhase("move");
         const next = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
         setCurrentAction(next);
-      } else {
-        setBurstKey((k) => k + 1); // trigger confetti
+        phaseTimeoutRef.current = setTimeout(switchPhase, MOVE_DURATION * 1000);
       }
-    }, MOVE_DURATION * 1000); // ⏱ dynamic duration
-    return () => clearInterval(id);
+    };
+
+    // Start with move
+    currentPhaseRef.current = "move";
+    setPhase("move");
+    setCurrentAction(ACTIONS[Math.floor(Math.random() * ACTIONS.length)]);
+    phaseTimeoutRef.current = setTimeout(switchPhase, MOVE_DURATION * 1000);
+
+    return () => {
+      if (phaseTimeoutRef.current) {
+        clearTimeout(phaseTimeoutRef.current);
+      }
+    };
   }, [running]);
 
   const startSession = async () => {
